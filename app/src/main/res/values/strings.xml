@@ -1,3 +1,13 @@
 <resources>
+    <!-- Global strings -->
     <string name="app_name">Imagine</string>
+
+    <!-- notifications and toasts -->
+    <string name="error_network_timeout">Timeout due to no response from server</string>
+    <string name="error_no_connection">There is no connection to the server</string>
+    <string name="error_auth_failure">There was a problem authenticating</string>
+    <string name="error_server_generic">There was a problem in the server</string>
+    <string name="error_network_generic">There is a problem with the network, please make sure you have a valid connection</string>
+    <string name="error_parse_generic">There was a problem getting the response from the server</string>
+    <string name="error_authentication">There was a problem in the authentication process</string>
 </resources>

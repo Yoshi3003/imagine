@@ -13,8 +13,16 @@ android {
     }
     buildTypes {
         release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SERVER_URL", "\"https://api.500px.com/v1\""
+            buildConfigField "String", "CONSUMER_KEY", "\"Qy58XkAS4IjlO7EB8MFe3Bty01WQNDcw8cRN6vIh\""
+        }
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SERVER_URL", "\"https://api.500px.com/v1\""
+            buildConfigField "String", "CONSUMER_KEY", "\"Qy58XkAS4IjlO7EB8MFe3Bty01WQNDcw8cRN6vIh\""
         }
     }
 }
@@ -22,5 +30,11 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+
+    // android support libraries
     compile 'com.android.support:appcompat-v7:23.4.0'
+
+    // HTTP libraries
+    compile 'com.android.volley:volley:1.0.0'
+    compile 'com.github.scribejava:scribejava-apis:2.5.3'
 }
