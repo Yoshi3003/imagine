@@ -33,8 +33,17 @@ dependencies {
 
     // android support libraries
     compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:cardview-v7:23.4.0'
 
-    // HTTP libraries
+    // image
+    compile 'com.github.bumptech.glide:glide:3.6.1'
+
+    // networking libraries
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.github.scribejava:scribejava-apis:2.5.3'
+
+    // data serializing
+    compile 'com.google.code.gson:gson:2.6.2'
 }

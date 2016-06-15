@@ -10,4 +10,11 @@
     <string name="error_network_generic">There is a problem with the network, please make sure you have a valid connection</string>
     <string name="error_parse_generic">There was a problem getting the response from the server</string>
     <string name="error_authentication">There was a problem in the authentication process</string>
+
+    <!-- Image card layout -->
+    <string name="placeholder_card_title">Undefined</string>
+    <string name="placeholder_image_description">None</string>
+
+    <!-- Intents -->
+    <string name="extra_category">intent.extra.category</string>
 </resources>

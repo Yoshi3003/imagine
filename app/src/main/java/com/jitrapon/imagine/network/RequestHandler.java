@@ -1,12 +1,14 @@
 package com.jitrapon.imagine.network;
 
 /**
- * Created by jitrapon on 14/6/16.
+ * Convenience class that encapsulates handling of sending HTTP requests and notifying the caller
+ * the response. For this implementation, the class uses Volley library.
  */
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -48,7 +50,7 @@ public class RequestHandler {
     private RequestQueue requestQueue;
     private ImageLoader imageLoader;
 
-    private static final String TAG = "Network";
+    private static final String TAG = "HTTP";
 
     private ApplicationState appState;
     private Context context;
@@ -142,7 +144,6 @@ public class RequestHandler {
      * Once added, the request queue will start sending the request
      */
     public <T> void addToRequestQueue(Request<T> req) {
-        VolleyLog.d("--> " + getMethodName(req) + " " + req.getUrl() + " (" + req.getTag() + ")");
         getRequestQueue().add(req);
     }
 
@@ -213,7 +214,7 @@ public class RequestHandler {
     /**
      * Convenience method for making an authenticated GET request using the endpoint
      */
-    public void get(String tag, String endpoint, final ResponseListener listener) {
+    public void get(final String tag, String endpoint, final ResponseListener listener) {
         String baseUrl = BuildConfig.SERVER_URL;
         String url;
         if (baseUrl.endsWith("/") && endpoint.startsWith("/"))
@@ -241,19 +242,15 @@ public class RequestHandler {
         {
 
             @Override
-            public String getUrl() {
-                return super.getUrl() + "?consumer_key=" + BuildConfig.CONSUMER_KEY;
-            }
-
-            @Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 int status = response.statusCode;
-                VolleyLog.d("<-- " + status + " " + getStatusText(status) + " (" + response.networkTimeMs + "ms, " +
+                Log.i(TAG, tag + " <--- " + status + " " + getStatusText(status) + " (" + response.networkTimeMs + "ms, " +
                         response.data.length + "-byte body)");
                 return super.parseNetworkResponse(response);
             }
         };
 
+        Log.i(TAG, tag + " ---> " + getMethodName(request) + " " + url);
         request.setTag(tag);
         addToRequestQueue(request);
     }
@@ -261,7 +258,7 @@ public class RequestHandler {
     /**
      * Convenience method for making an authenticated POST request using the HOST_ADDRESS and specifying body and endpoint
      */
-    public void post(String tag, String endpoint, JSONObject body, final ResponseListener listener) {
+    public void post(final String tag, String endpoint, JSONObject body, final ResponseListener listener) {
         String baseUrl = BuildConfig.SERVER_URL;
         String url;
         if (baseUrl.endsWith("/") && endpoint.startsWith("/"))
@@ -289,19 +286,15 @@ public class RequestHandler {
         {
 
             @Override
-            public String getUrl() {
-                return super.getUrl() + "?consumer_key=" + BuildConfig.CONSUMER_KEY;
-            }
-
-            @Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 int status = response.statusCode;
-                VolleyLog.d("<-- " + status + " " + getStatusText(status) + " (" + response.networkTimeMs + "ms, " +
+                Log.i(TAG, tag + " <--- " + status + " " + getStatusText(status) + " (" + response.networkTimeMs + "ms, " +
                         response.data.length + "-byte body)");
                 return super.parseNetworkResponse(response);
             }
         };
 
+        Log.i(TAG, tag + " ---> " + getMethodName(request) + " " + url);
         request.setTag(tag);
         addToRequestQueue(request);
     }
@@ -309,7 +302,7 @@ public class RequestHandler {
     /**
      * Convenience method for making an authenticated DELETE request
      */
-    public void delete(String tag, String endpoint, JSONObject body, final ResponseListener listener) {
+    public void delete(final String tag, String endpoint, JSONObject body, final ResponseListener listener) {
         String baseUrl = BuildConfig.SERVER_URL;
         String url;
         if (baseUrl.endsWith("/") && endpoint.startsWith("/"))
@@ -337,19 +330,15 @@ public class RequestHandler {
         {
 
             @Override
-            public String getUrl() {
-                return super.getUrl() + "?consumer_key=" + BuildConfig.CONSUMER_KEY;
-            }
-
-            @Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 int status = response.statusCode;
-                VolleyLog.d("<-- " + status + " " + getStatusText(status) + " (" + response.networkTimeMs + "ms, " +
+                Log.i(TAG, tag + " <--- " + status + " " + getStatusText(status) + " (" + response.networkTimeMs + "ms, " +
                         response.data.length + "-byte body)");
                 return super.parseNetworkResponse(response);
             }
         };
 
+        Log.i(TAG, tag + " ---> " + getMethodName(request) + " " + url);
         request.setTag(tag);
         addToRequestQueue(request);
     }

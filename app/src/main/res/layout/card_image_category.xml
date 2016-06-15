@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardView="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/movie_card_view"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/card_layout_height"
+    android:background="?android:attr/selectableItemBackground"
+    cardView:cardUseCompatPadding="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/category_image"
+            android:contentDescription="@string/placeholder_image_description"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/category_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/placeholder_card_title"
+            android:textAllCaps="true"
+            android:fontFamily="sans-serif-thin"
+            android:textSize="@dimen/card_category_title_size"
+            android:textColor="@android:color/white"/>
+    </FrameLayout>
+
+
+
+</android.support.v7.widget.CardView>
