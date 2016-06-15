@@ -176,4 +176,42 @@ public class DataProvider {
             }
         });
     }
+
+    /**
+     * Retrieves information about a single photo with a specified size [1 - 4]
+     */
+    public void getPhoto(long id, int size) {
+        String endpoint = new Uri.Builder()
+                .appendEncodedPath(API.GET_PHOTOS)
+                .appendEncodedPath(Long.toString(id))
+                .appendQueryParameter(API.QUERY_SIZE, Integer.toString(size))
+                .appendQueryParameter(API.QUERY_CONSUMER_KEY, BuildConfig.CONSUMER_KEY)
+                .build()
+                .toString();
+
+        requestHandler.get("GET PHOTO", endpoint, new ResponseListener() {
+            @Override
+            public void onSuccess(final JSONObject response) {
+                run(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject jsonPhoto = response.getJSONObject(API.JSON_PHOTO);
+                            Photo photo = gson.fromJson(jsonPhoto.toString(), Photo.class);
+                            sendMessage(Event.GET_PHOTO_SUCCESS, photo);
+                        }
+                        catch (Exception ex) {
+                            Log.e(TAG, ex.getMessage());
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+                Log.e(TAG, error.getMessage());
+                sendMessage(Event.GET_PHOTO_FAILED, null);
+            }
+        });
+    }
 }

@@ -46,4 +46,7 @@ dependencies {
 
     // data serializing
     compile 'com.google.code.gson:gson:2.6.2'
+
+    // animations
+    compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
 }

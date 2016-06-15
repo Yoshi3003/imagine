@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.jitrapon.imagine.ApplicationState;
 import com.jitrapon.imagine.Event;
@@ -30,6 +31,7 @@ import java.util.List;
 public class GalleryActivity extends AppCompatActivity implements Handler.Callback, ItemClickedListener,
         SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = "GalleryActivity";
     private static final int NUM_GRID_COLUMNS = 2;
     private GalleryAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
@@ -86,7 +88,7 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         }
         else {
             category = Category.valueOf(intent.getStringExtra(getString(R.string.extra_category)));
-            if (toolbar != null) toolbar.setTitle(category.asQueryParameter());
+            if (getSupportActionBar() != null) getSupportActionBar().setTitle(category.asQueryParameter());
 
             // begin retrieving the photos!
             dataProvider.getPhotos(category);
@@ -149,6 +151,13 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
     @Override
     public void onItemClicked(Object obj) {
+        if (obj instanceof Photo) {
+            Photo photo = (Photo) obj;
+            Log.d(TAG, "Viewing " + photo.name);
 
+            Intent intent = new Intent(this, PhotoViewActivity.class);
+            intent.putExtra(getString(R.string.extra_photo_id), photo.id);
+            startActivity(intent);
+        }
     }
 }

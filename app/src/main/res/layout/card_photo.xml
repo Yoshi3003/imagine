@@ -17,23 +17,32 @@
             android:id="@+id/photo_image"
             android:contentDescription="@string/placeholder_image_description"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="@dimen/card_photo_image_height"
             android:scaleType="fitXY"
             android:background="@android:color/darker_gray"/>
 
         <TextView
             android:id="@+id/photo_title"
+            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingRight="0dp"
+            android:paddingEnd="0dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/photo_image"
             android:text="@string/placeholder_card_title"
             android:textSize="@dimen/card_photo_title_size"
+            android:fontFamily="sans-serif-thin"
             android:textColor="@color/colorTextPrimary"
             android:maxLines="1"
             android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/photo_username"
+            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingRight="0dp"
+            android:paddingEnd="0dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/photo_title"

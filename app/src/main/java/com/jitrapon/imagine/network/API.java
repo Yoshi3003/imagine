@@ -8,6 +8,7 @@ public class API {
     /** All JSON serializable fields **/
     public static final String JSON_ID = "id";
     public static final String JSON_NAME = "name";
+    public static final String JSON_PHOTO = "photo";
     public static final String JSON_PHOTOS = "photos";
     public static final String JSON_IMAGES = "images";
     public static final String JSON_URL = "url";
@@ -21,6 +22,7 @@ public class API {
     public static final String PARAM_FRESH_WEEK = "fresh_week";
     public static final String QUERY_SORT = "sort";
     public static final String PARAM_CREATED_AT = "created_at";
+    public static final String QUERY_SIZE = "size";
 
     /** All endpoints **/
     public static final String GET_PHOTOS = "photos";

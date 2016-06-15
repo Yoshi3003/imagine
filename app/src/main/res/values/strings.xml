@@ -1,6 +1,7 @@
 <resources>
-    <!-- Global strings -->
+    <!-- Other strings -->
     <string name="app_name">Imagine</string>
+    <string name="loading">Loading…</string>
 
     <!-- notifications and toasts -->
     <string name="error_network_timeout">Timeout due to no response from server</string>
@@ -17,4 +18,5 @@
 
     <!-- Intents -->
     <string name="extra_category">intent.extra.category</string>
+    <string name="extra_photo_id">intent.extra.photo.id</string>
 </resources>
