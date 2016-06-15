@@ -9,5 +9,7 @@
     <dimen name="card_margin">5dp</dimen>
     <dimen name="card_layout_height">240dp</dimen>
     <dimen name="card_content_padding">10dp</dimen>
-    <dimen name="card_category_title_size">32sp</dimen>
+    <dimen name="card_category_title_size">34sp</dimen>
+    <dimen name="card_photo_title_size">24sp</dimen>
+    <dimen name="card_photo_author_size">17sp</dimen>
 </resources>

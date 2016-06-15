@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jitrapon.imagine.R;
 import com.jitrapon.imagine.interfaces.ItemClickedListener;
 import com.jitrapon.imagine.models.Category;
@@ -72,7 +73,8 @@ public class ImageCategoryAdapter extends RecyclerView.Adapter<RecyclerView.View
         viewHolder.title.setText(category.asQueryParameter());
         Glide.with(context)
                 .load(category.asBackground())
-                .crossFade(200)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .crossFade(400)
                 .fitCenter()
                 .into(viewHolder.background);
     }

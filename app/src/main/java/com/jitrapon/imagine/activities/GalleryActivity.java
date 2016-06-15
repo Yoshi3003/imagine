@@ -30,7 +30,7 @@ import java.util.List;
 public class GalleryActivity extends AppCompatActivity implements Handler.Callback, ItemClickedListener,
         SwipeRefreshLayout.OnRefreshListener {
 
-    private static final int NUM_GRID_COLUMNS = 3;
+    private static final int NUM_GRID_COLUMNS = 2;
     private GalleryAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
 
@@ -65,7 +65,7 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         if (refreshLayout != null) {
             refreshLayout.setOnRefreshListener(this);
             refreshLayout.setColorSchemeColors(
-                
+                R.color.colorAccent, R.color.colorPrimary
             );
         }
 
@@ -114,7 +114,8 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
             case Event.GET_PHOTOS_SUCCESS: {
                 List<Photo> temp = msg.obj == null ? null : (List<Photo>) msg.obj;
                 if (temp != null) {
-                    photos = temp;
+                    photos.clear();
+                    photos.addAll(temp);
                 }
                 else {
                     photos.clear();

@@ -9,6 +9,10 @@ public class API {
     public static final String JSON_ID = "id";
     public static final String JSON_NAME = "name";
     public static final String JSON_PHOTOS = "photos";
+    public static final String JSON_IMAGES = "images";
+    public static final String JSON_URL = "url";
+    public static final String JSON_USER = "user";
+    public static final String JSON_USERNAME = "username";
 
     /** All query parameters **/
     public static final String QUERY_CONSUMER_KEY = "consumer_key";
