@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 
 import com.jitrapon.imagine.ApplicationState;
 import com.jitrapon.imagine.Event;
@@ -43,6 +44,8 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
     private Category category;
 
+    private Handler handler;
+
     /********************************************************
      * ACTIVITY CALLBACKS
      ********************************************************/
@@ -55,24 +58,25 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         photos = new ArrayList<>();
         ApplicationState state = ApplicationState.getInstance(this);
         dataProvider = DataProvider.getInstance(state);
-        Handler handler = new Handler(this);
+        handler = new Handler(this);
         dataProvider.setHandler(handler);
 
         setContentView(R.layout.activity_gallery);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         if (refreshLayout != null) {
             refreshLayout.setOnRefreshListener(this);
-            refreshLayout.setColorSchemeColors(
-                R.color.colorAccent, R.color.colorPrimary
+            refreshLayout.setColorSchemeResources(
+                R.color.colorAccent
             );
         }
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery_view);
-        adapter = new GalleryAdapter(this, photos, this);
+        adapter = new GalleryAdapter(getApplicationContext(), photos, this);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);
             GridLayoutManager layoutManager = new GridLayoutManager(this, NUM_GRID_COLUMNS);
@@ -105,6 +109,25 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // make sure that when this activity is resumed, its handler will be notified of messages
+        dataProvider.setHandler(handler);
+    }
+
     /********************************************************
      * EVENT CALLBACKS TO UI. This is done with Handler, but can
      * be replaced with other EventBus-like system
@@ -128,6 +151,10 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
                 // stop the refreshing icon
                 refreshLayout.setRefreshing(false);
+
+                break;
+            }
+            case Event.GET_PHOTOS_FAILED: {
 
                 break;
             }

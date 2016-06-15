@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -25,11 +27,19 @@ import com.jitrapon.imagine.models.Photo;
  */
 public class PhotoViewActivity extends AppCompatActivity implements Handler.Callback {
 
+    private static final String TAG = "PhotoViewActivity";
+
     private ImageView imageView;
     private CircularProgressView loadingIcon;
     private static final int IMAGE_SIZE = 4;    // 500pix allows specifying of image size, 4 is the largest
 
     private DataProvider dataProvider;
+
+    private Handler handler;
+
+    /********************************************************
+     * ACTIVITY CALLBACKS
+     ********************************************************/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +48,22 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
 
         ApplicationState state = ApplicationState.getInstance(this);
         dataProvider = DataProvider.getInstance(state);
-        Handler handler = new Handler(this);
+        handler = new Handler(this);
         dataProvider.setHandler(handler);
 
         setContentView(R.layout.activity_photo_view);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) getSupportActionBar().setTitle(getString(R.string.loading));
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(getString(R.string.loading));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         imageView = (ImageView) findViewById(R.id.photo_full_image);
+        if (imageView != null)
+            imageView.setVisibility(View.INVISIBLE);
+
         loadingIcon = (CircularProgressView) findViewById(R.id.loading_icon);
         if (loadingIcon != null) {
             loadingIcon.startAnimation();
@@ -66,6 +83,25 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // make sure that when this activity is resumed, its handler will be notified of messages
+        dataProvider.setHandler(handler);
+    }
+
     /********************************************************
      * EVENT CALLBACKS TO UI. This is done with Handler, but can
      * be replaced with other EventBus-like system
@@ -75,23 +111,40 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
     public boolean handleMessage(Message msg) {
         switch(msg.what) {
             case Event.GET_PHOTO_SUCCESS: {
-                Photo photo = msg.obj == null ? null : (Photo) msg.obj;
-                if (photo != null) {
-                    if (getSupportActionBar() != null) {
-                        getSupportActionBar().setTitle(photo.name);
-                        getSupportActionBar().setSubtitle(photo.user.username);
+                try {
+                    Photo photo = msg.obj == null ? null : (Photo) msg.obj;
+                    if (photo != null) {
+                        if (getSupportActionBar() != null) {
+                            getSupportActionBar().setTitle(photo.name);
+                            getSupportActionBar().setSubtitle(photo.user.username);
+                        }
+
+                        // load the image!
+                        if (photo.images != null && photo.images.size() > 0) {
+                            imageView.setVisibility(View.VISIBLE);
+                            Glide.with(getApplicationContext())
+                                    .load(photo.images.get(0).url)
+                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                    .crossFade(100)
+                                    .fitCenter()
+                                    .into(imageView);
+                        }
+
+                        loadingIcon.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingIcon.setVisibility(View.INVISIBLE);
+                            }
+                        }, 1000);
                     }
-
-                    // load the image!
-                    Glide.with(this)
-                            .load(photo.images.get(0).url)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .crossFade(400)
-                            .fitCenter()
-                            .into(imageView);
-
-                    loadingIcon.setVisibility(View.GONE);
                 }
+                catch (Exception ex) {
+                    Log.e(TAG, ex.getMessage());
+                }
+
+                break;
+            }
+            case Event.GET_PHOTO_FAILED: {
 
                 break;
             }

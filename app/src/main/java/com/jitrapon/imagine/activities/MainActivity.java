@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickedListen
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) getSupportActionBar().setTitle(getString(R.string.choose_photo_category));
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.image_category_list);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);

@@ -8,6 +8,4 @@
     <color name="colorTextPrimary">#212121</color>
     <color name="colorTextSecondary">#727272</color>
     <color name="colorDivider">#B6B6B6</color>
-    <drawable name="bg_uncategorized">#727272</drawable>
-    <drawable name="bg_nude">#FF5722</drawable>
 </resources>

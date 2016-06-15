@@ -2,6 +2,7 @@
     <!-- Other strings -->
     <string name="app_name">Imagine</string>
     <string name="loading">Loading…</string>
+    <string name="choose_photo_category">Choose a category</string>
 
     <!-- notifications and toasts -->
     <string name="error_network_timeout">Timeout due to no response from server</string>

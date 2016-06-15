@@ -164,6 +164,7 @@ public class DataProvider {
                         }
                         catch (Exception ex) {
                             Log.e(TAG, ex.getMessage());
+                            sendMessage(Event.GET_PHOTOS_FAILED, null);
                         }
                     }
                 });
@@ -202,6 +203,7 @@ public class DataProvider {
                         }
                         catch (Exception ex) {
                             Log.e(TAG, ex.getMessage());
+                            sendMessage(Event.GET_PHOTOS_FAILED, null);
                         }
                     }
                 });
