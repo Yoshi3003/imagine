@@ -78,6 +78,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (photo.images != null && photo.images.size() > 0)
             Glide.with(context)
                     .load(photo.images.get(0).url)
+                    .error(R.drawable.error)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .crossFade(400)
                     .fitCenter()

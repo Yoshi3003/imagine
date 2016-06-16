@@ -27,4 +27,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ImageView
+        android:id="@+id/offline_icon"
+        android:layout_centerInParent="true"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/ic_offline"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/offline_caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/caption_load_photo_failed"
+        android:layout_below="@id/offline_icon"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"/>
+
 </RelativeLayout>

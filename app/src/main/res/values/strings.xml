@@ -3,6 +3,7 @@
     <string name="app_name">Imagine</string>
     <string name="loading">Loading…</string>
     <string name="choose_photo_category">Choose a category</string>
+    <string name="error">Error</string>
 
     <!-- notifications and toasts -->
     <string name="error_network_timeout">Timeout due to no response from server</string>
@@ -14,12 +15,16 @@
     <string name="error_authentication">There was a problem in the authentication process</string>
     <string name="no_more_photos_available">No more photos in this category!</string>
     <string name="notification_fetching_photos">Fetching more photos…</string>
+    <string name="notification_offline">No network connection</string>
+    <string name="caption_load_photos_failed">Can\'t load photos\nSwipe down to try again</string>
+    <string name="caption_load_photo_failed">Can\'t load the photo</string>
 
     <!-- Image card layout -->
     <string name="placeholder_card_title">Undefined</string>
     <string name="placeholder_image_description">None</string>
 
     <!-- Intents -->
+    <string name="action_conn_state_change">android.net.conn.CONNECTIVITY_CHANGE</string>
     <string name="extra_category">intent.extra.category</string>
     <string name="extra_photo_id">intent.extra.photo.id</string>
 </resources>

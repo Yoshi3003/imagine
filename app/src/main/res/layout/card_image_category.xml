@@ -23,14 +23,17 @@
 
         <TextView
             android:id="@+id/category_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="center"
             android:text="@string/placeholder_card_title"
             android:textAllCaps="true"
             android:fontFamily="sans-serif-thin"
             android:textSize="@dimen/card_category_title_size"
-            android:textColor="@android:color/white"/>
+            android:padding="8dip"
+            android:textColor="@android:color/white"
+            android:background="#4a000000"/>
     </FrameLayout>
 
 

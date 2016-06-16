@@ -13,19 +13,44 @@
         android:id="@+id/toolbar_layout"
         layout="@layout/toolbar" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <RelativeLayout
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/gallery_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical" />
+        <ImageView
+            android:id="@+id/offline_icon"
+            android:layout_centerInParent="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_offline"
+            android:visibility="invisible"/>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+        <TextView
+            android:id="@+id/offline_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caption_load_photos_failed"
+            android:layout_below="@id/offline_icon"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"/>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/gallery_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical" />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/scroll_up_fab"

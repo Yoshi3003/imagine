@@ -1,6 +1,9 @@
 package com.jitrapon.imagine.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +18,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jitrapon.imagine.ApplicationState;
@@ -47,6 +52,8 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
     private GridLayoutManager layoutManager;
     private FloatingActionButton fab;
     private CoordinatorLayout rootLayout;
+    private ImageView offlineIcon;
+    private TextView offlineCaption;
 
     /** this is the model that will be synced with the adapter **/
     private List<Photo> photos;
@@ -55,6 +62,7 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
     /** current page of the list **/
     private int currentPage;
 
+    private ApplicationState appState;
     private DataProvider dataProvider;
 
     /** UI thread updater **/
@@ -62,6 +70,10 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
     /** indicates that we will clear all data and reload everything **/
     private boolean reset;
+
+    /** Broadcast receivers for watching connection change **/
+    private IntentFilter intentFilter;
+    private BroadcastReceiver receiver;
 
     /********************************************************
      * SCROLL CALLBACKS
@@ -123,19 +135,23 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         currentPage = 0;
         reset = false;
         photos = new ArrayList<>();
-        ApplicationState state = ApplicationState.getInstance(this);
-        dataProvider = DataProvider.getInstance(state);
+        appState = ApplicationState.getInstance(this);
+        dataProvider = DataProvider.getInstance(appState);
         handler = new Handler(this);
         dataProvider.setHandler(handler);
 
         setContentView(R.layout.activity_gallery);
         rootLayout = (CoordinatorLayout) findViewById(R.id.root_layout);
-
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery_view);
+        fab = (FloatingActionButton) findViewById(R.id.scroll_up_fab);
+        offlineIcon = (ImageView) findViewById(R.id.offline_icon);
+        offlineCaption = (TextView) findViewById(R.id.offline_caption);
+
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         if (refreshLayout != null) {
             refreshLayout.setOnRefreshListener(this);
             refreshLayout.setColorSchemeResources(
@@ -143,7 +159,6 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
             );
         }
 
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery_view);
         adapter = new GalleryAdapter(getApplicationContext(), photos, this);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);
@@ -153,7 +168,6 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
             recyclerView.addOnScrollListener(scrollListener);
         }
 
-        fab = (FloatingActionButton) findViewById(R.id.scroll_up_fab);
         if (fab != null) {
             fab.hide();
             fab.setOnClickListener(new View.OnClickListener() {
@@ -171,21 +185,45 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
             finish();
         }
         else {
+            intentFilter = new IntentFilter();
+            intentFilter.addAction(getString(R.string.action_conn_state_change));
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (!appState.isConnected()) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Snackbar.make(rootLayout,
+                                        R.string.notification_offline,
+                                        Snackbar.LENGTH_LONG).show();
+                            }
+                        }, 500);
+                    }
+                }
+            };
+
             category = Category.valueOf(intent.getStringExtra(getString(R.string.extra_category)));
             if (getSupportActionBar() != null) getSupportActionBar().setTitle(category.asTitle());
 
-            // begin retrieving the photos!
-            dataProvider.getPhotos(category, currentPage + 1);
+            // begin retrieving the photos, if we are connected to the internet
+            if (appState.isConnected()) {
+                dataProvider.getPhotos(category, currentPage + 1);
 
-            // this is to force the icon of refreshing to show
-            // if we don't do this, it won't show!
-            // credit: http://stackoverflow.com/questions/26858692/swiperefreshlayout-setrefreshing-not-showing-indicator-initially
-            refreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    refreshLayout.setRefreshing(true);
-                }
-            });
+                // this is to force the icon of refreshing to show
+                // if we don't do this, it won't show!
+                // credit: http://stackoverflow.com/questions/26858692/swiperefreshlayout-setrefreshing-not-showing-indicator-initially
+                refreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshLayout.setRefreshing(true);
+                    }
+                });
+            }
+            else {
+                offlineCaption.setVisibility(View.VISIBLE);
+                offlineIcon.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -208,6 +246,20 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         dataProvider.setHandler(handler);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (receiver != null) unregisterReceiver(receiver);
+    }
+
     /********************************************************
      * EVENT CALLBACKS TO UI. This is done with Handler, but can
      * be replaced with other EventBus-like system
@@ -219,6 +271,11 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
             // triggered when the loading of photos is completed successfully
             case Event.GET_PHOTOS_SUCCESS: {
+
+                // hide the offline indicators
+                offlineCaption.setVisibility(View.INVISIBLE);
+                offlineIcon.setVisibility(View.INVISIBLE);
+
                 List<Photo> temp = msg.obj == null ? null : (List<Photo>) msg.obj;
                 currentPage = msg.arg1;
 
@@ -252,6 +309,11 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
             // triggered when there was a problem loading list of photos
             case Event.GET_PHOTOS_FAILED: {
+                refreshLayout.setRefreshing(false);
+
+                Snackbar.make(rootLayout,
+                    R.string.notification_offline,
+                    Snackbar.LENGTH_LONG).show();
 
                 break;
             }

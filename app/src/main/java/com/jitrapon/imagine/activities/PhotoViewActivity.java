@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -29,8 +30,10 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
 
     private static final String TAG = "PhotoViewActivity";
 
-    private ImageView imageView;
+    private ImageView displayImageView;
     private CircularProgressView loadingIcon;
+    private ImageView offlineIcon;
+    private TextView offlineCaption;
 
     private static final int IMAGE_SIZE = 4;    // 500pix allows specifying of image size, 4 is the largest
 
@@ -54,6 +57,10 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
         dataProvider.setHandler(handler);
 
         setContentView(R.layout.activity_photo_view);
+        displayImageView = (ImageView) findViewById(R.id.photo_full_image);
+        loadingIcon = (CircularProgressView) findViewById(R.id.loading_icon);
+        offlineIcon = (ImageView) findViewById(R.id.offline_icon);
+        offlineCaption = (TextView) findViewById(R.id.offline_caption);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -62,11 +69,8 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        imageView = (ImageView) findViewById(R.id.photo_full_image);
-        if (imageView != null)
-            imageView.setVisibility(View.INVISIBLE);
-
-        loadingIcon = (CircularProgressView) findViewById(R.id.loading_icon);
+        if (displayImageView != null)
+            displayImageView.setVisibility(View.INVISIBLE);
         if (loadingIcon != null) {
             loadingIcon.startAnimation();
         }
@@ -125,13 +129,14 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
 
                         // load the image!
                         if (photo.images != null && photo.images.size() > 0) {
-                            imageView.setVisibility(View.VISIBLE);
+                            displayImageView.setVisibility(View.VISIBLE);
                             Glide.with(getApplicationContext())
                                     .load(photo.images.get(0).url)
+                                    .error(R.drawable.error)
                                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                                     .crossFade(100)
                                     .fitCenter()
-                                    .into(imageView);
+                                    .into(displayImageView);
                         }
 
                         loadingIcon.postDelayed(new Runnable() {
@@ -151,6 +156,10 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
 
             // triggered when there was a problem in loading the photo
             case Event.GET_PHOTO_FAILED: {
+                loadingIcon.setVisibility(View.INVISIBLE);
+                offlineIcon.setVisibility(View.VISIBLE);
+                offlineCaption.setVisibility(View.VISIBLE);
+                if (getSupportActionBar() != null) getSupportActionBar().setTitle(getString(R.string.error));
 
                 break;
             }
