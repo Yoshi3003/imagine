@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.jitrapon.imagine.ApplicationState;
@@ -41,6 +45,8 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
     private GalleryAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private GridLayoutManager layoutManager;
+    private FloatingActionButton fab;
+    private CoordinatorLayout rootLayout;
 
     /** this is the model that will be synced with the adapter **/
     private List<Photo> photos;
@@ -72,10 +78,25 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
-            if (isLastItemDisplaying(recyclerView)) {
+            // if at the top
+            if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+                fab.hide();
+            }
+
+            // if we scroll to the last items in the list
+            else if (isLastItemDisplaying(recyclerView)) {
                 Log.d(TAG, "Reaching the end of the list! fetching data for more...");
 
+                // for simplicity, show the loading indicator
+                // this can be improved by showing another indicator at the bottom instead
+                refreshLayout.setRefreshing(true);
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.notification_fetching_photos), Toast.LENGTH_SHORT).show();
+
                 dataProvider.getPhotos(category, currentPage + 1);
+            }
+            else {
+                if (!fab.isShown()) fab.show();
             }
         }
     };
@@ -108,6 +129,7 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         dataProvider.setHandler(handler);
 
         setContentView(R.layout.activity_gallery);
+        rootLayout = (CoordinatorLayout) findViewById(R.id.root_layout);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -121,7 +143,7 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
             );
         }
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery_view);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery_view);
         adapter = new GalleryAdapter(getApplicationContext(), photos, this);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);
@@ -129,6 +151,17 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
             recyclerView.addOnScrollListener(scrollListener);
+        }
+
+        fab = (FloatingActionButton) findViewById(R.id.scroll_up_fab);
+        if (fab != null) {
+            fab.hide();
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (recyclerView != null) recyclerView.smoothScrollToPosition(0);
+                }
+            });
         }
 
         // begin loading photos from the REST endpoint
@@ -139,7 +172,7 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         }
         else {
             category = Category.valueOf(intent.getStringExtra(getString(R.string.extra_category)));
-            if (getSupportActionBar() != null) getSupportActionBar().setTitle(category.asQueryParameter());
+            if (getSupportActionBar() != null) getSupportActionBar().setTitle(category.asTitle());
 
             // begin retrieving the photos!
             dataProvider.getPhotos(category, currentPage + 1);
@@ -206,8 +239,9 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
                 // otherwise, no more photos loaded
                 else {
-                    Toast.makeText(getApplicationContext(),
-                            getString(R.string.no_more_photos_available), Toast.LENGTH_LONG).show();
+                    Snackbar.make(rootLayout,
+                            R.string.no_more_photos_available,
+                            Snackbar.LENGTH_LONG).show();
                 }
 
                 // stop the refreshing icon
@@ -230,6 +264,10 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
      * REFRESH CALLBACK
      ********************************************************/
 
+    /**
+     * When the user manually refreshes (i.e. by pull-to-refresh), the data list will be reset back to first page.
+     * To reduce complexity, we just clear the entire list.
+     */
     @Override
     public void onRefresh() {
         currentPage = 0;

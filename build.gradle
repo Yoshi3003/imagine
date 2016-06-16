@@ -21,3 +21,11 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    supportLibraryVersion = "23.4.0"
+    glideVersion = "3.6.1"
+    volleyVersion = "1.0.0"
+    gsonVersion = "2.6.2"
+    circularProgressViewVersion="2.5.0"
+}

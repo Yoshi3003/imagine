@@ -16,8 +16,21 @@
         <item name="colorAccent">@color/colorPrimaryDark</item>
     </style>
 
+    <!-- App Bar -->
     <style name="AppMaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <style name="AppMaterialTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- Floating action button -->
+    <style name="FabStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/mini_fab_layout_margin</item>
+        <item name="android:src">@drawable/ic_action_up</item>
+        <item name="backgroundTint">@color/colorAccent</item>
+        <item name="borderWidth">@dimen/mini_fab_border_width</item>
+        <item name="elevation">@dimen/mini_fab_elevation</item>
+        <item name="pressedTranslationZ">@dimen/mini_fab_pressed_translation_z</item>
+        <item name="rippleColor">@android:color/white</item>
+    </style>
 
 </resources>

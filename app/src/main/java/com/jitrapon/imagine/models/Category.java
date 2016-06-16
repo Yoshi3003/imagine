@@ -51,5 +51,10 @@ public enum Category {
         return name().toLowerCase().replace('_', ' ');
     }
 
+    public String asTitle() {
+        if (name().length() == 1) return name();
+        return name().charAt(0) + name().substring(1).toLowerCase().replace('_', ' ');
+    }
+
     public int asBackground() { return background; }
 }

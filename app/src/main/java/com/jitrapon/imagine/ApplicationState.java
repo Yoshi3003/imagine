@@ -1,13 +1,10 @@
 package com.jitrapon.imagine;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 /**
  * Handles abstraction to the application global states. This includes setting values.
- * Currently, the settings are stored in SharedPreferences. This is a Singleton class.
- * This is to demo that any global application states should be stored inside this class.
+ * Currently, for this demo, we only store the app's connection state.
  *
  * @author Jitrapon Tiachunpun
  */
@@ -16,7 +13,6 @@ public class ApplicationState {
     private static ApplicationState instance;
 
     private Context context;
-    private SharedPreferences settings;
 
     /********************************************************
      * INITIALIZATIONS & HELPERS
@@ -27,7 +23,6 @@ public class ApplicationState {
      */
     private ApplicationState(Context ctx) {
         context = ctx.getApplicationContext();
-        settings = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public static synchronized ApplicationState getInstance(Context ctx) {

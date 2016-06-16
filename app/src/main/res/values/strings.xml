@@ -13,6 +13,7 @@
     <string name="error_parse_generic">There was a problem getting the response from the server</string>
     <string name="error_authentication">There was a problem in the authentication process</string>
     <string name="no_more_photos_available">No more photos in this category!</string>
+    <string name="notification_fetching_photos">Fetching more photos…</string>
 
     <!-- Image card layout -->
     <string name="placeholder_card_title">Undefined</string>

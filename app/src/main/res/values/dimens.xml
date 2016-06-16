@@ -3,6 +3,12 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <!-- Floating action button -->
+    <dimen name="mini_fab_border_width">0dp</dimen>
+    <dimen name="mini_fab_elevation">6dp</dimen>
+    <dimen name="mini_fab_pressed_translation_z">12dp</dimen>
+    <dimen name="mini_fab_layout_margin">16dp</dimen>
+
     <!-- Image category cardview -->
     <dimen name="card_padding">8dp</dimen>
     <dimen name="card_corner_radius">4dp</dimen>
