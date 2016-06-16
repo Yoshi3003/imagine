@@ -12,6 +12,7 @@
     <string name="error_network_generic">There is a problem with the network, please make sure you have a valid connection</string>
     <string name="error_parse_generic">There was a problem getting the response from the server</string>
     <string name="error_authentication">There was a problem in the authentication process</string>
+    <string name="no_more_photos_available">No more photos in this category!</string>
 
     <!-- Image card layout -->
     <string name="placeholder_card_title">Undefined</string>

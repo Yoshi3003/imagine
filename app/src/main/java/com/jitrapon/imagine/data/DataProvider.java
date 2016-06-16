@@ -95,6 +95,12 @@ public class DataProvider {
         }
     }
 
+    public void sendMessage(int eventId, int arg1, int arg2, Object arg) {
+        if (handler != null) {
+            handler.sendMessage(handler.obtainMessage(eventId, arg1, arg2, arg));
+        }
+    }
+
     /********************************************************
      * PHOTOS OPERATIONS
      ********************************************************/
@@ -136,15 +142,16 @@ public class DataProvider {
     }
 
     /**
-     * Retrieves list of photos based on the specified category, sorted by date of upload.
+     * Retrieves list of photos based on the specified category, sorted by date of upload, and the current page
      */
-    public void getPhotos(Category category) {
+    public void getPhotos(Category category, int page) {
         if (category == null) category = Category.UNCATEGORIZED;
 
         String endpoint = new Uri.Builder()
                 .appendEncodedPath(API.GET_PHOTOS)
                 .appendQueryParameter(API.QUERY_CATEGORY, category.asQueryParameter())
                 .appendQueryParameter(API.QUERY_SORT, API.PARAM_CREATED_AT)
+                .appendQueryParameter(API.QUERY_PAGE, Integer.toString(page))
                 .appendQueryParameter(API.QUERY_CONSUMER_KEY, BuildConfig.CONSUMER_KEY)
                 .build()
                 .toString();
@@ -158,9 +165,12 @@ public class DataProvider {
                         try {
                             Type type = new TypeToken<List<Photo>>() {}.getType();
                             JSONArray jsonPhotos = response.getJSONArray(API.JSON_PHOTOS);
+                            int currentPage = Integer.parseInt(response.getString(API.JSON_CURRENT_PAGE));
+                            int totalPages = Integer.parseInt(response.getString(API.JSON_TOTAL_PAGES));
                             List<Photo> photos = gson.fromJson(jsonPhotos.toString(), type);
                             Log.i(TAG, "Found " + photos.size() + " in the response");
-                            sendMessage(Event.GET_PHOTOS_SUCCESS, photos);
+
+                            sendMessage(Event.GET_PHOTOS_SUCCESS, currentPage, totalPages, photos);
                         }
                         catch (Exception ex) {
                             Log.e(TAG, ex.getMessage());

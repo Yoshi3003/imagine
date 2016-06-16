@@ -4,6 +4,7 @@ import com.jitrapon.imagine.R;
 
 /**
  * Represents all the categories available that a photo will belong to.
+ * A category will contain a unique ID and a background resource ID
  */
 public enum Category {
 

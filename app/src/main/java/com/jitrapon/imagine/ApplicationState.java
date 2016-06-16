@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 /**
  * Handles abstraction to the application global states. This includes setting values.
  * Currently, the settings are stored in SharedPreferences. This is a Singleton class.
+ * This is to demo that any global application states should be stored inside this class.
  *
  * @author Jitrapon Tiachunpun
  */

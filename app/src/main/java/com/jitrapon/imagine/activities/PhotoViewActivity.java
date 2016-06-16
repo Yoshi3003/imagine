@@ -31,10 +31,12 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
 
     private ImageView imageView;
     private CircularProgressView loadingIcon;
+
     private static final int IMAGE_SIZE = 4;    // 500pix allows specifying of image size, 4 is the largest
 
     private DataProvider dataProvider;
 
+    /** UI thread updater **/
     private Handler handler;
 
     /********************************************************
@@ -110,6 +112,8 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
     @Override
     public boolean handleMessage(Message msg) {
         switch(msg.what) {
+
+            // triggered when the photo information has been loaded successfully
             case Event.GET_PHOTO_SUCCESS: {
                 try {
                     Photo photo = msg.obj == null ? null : (Photo) msg.obj;
@@ -144,6 +148,8 @@ public class PhotoViewActivity extends AppCompatActivity implements Handler.Call
 
                 break;
             }
+
+            // triggered when there was a problem in loading the photo
             case Event.GET_PHOTO_FAILED: {
 
                 break;

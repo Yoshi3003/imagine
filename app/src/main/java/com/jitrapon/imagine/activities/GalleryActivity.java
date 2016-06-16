@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.jitrapon.imagine.ApplicationState;
 import com.jitrapon.imagine.Event;
@@ -26,6 +27,7 @@ import java.util.List;
 
 /**
  * This is the activity that will display a list of photos belonging to a particular category.
+ * Initially, the adapter will load 20 items into the list for display for performance reason.
  *
  * @author Jitrapon Tiachunpun
  */
@@ -33,18 +35,60 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "GalleryActivity";
+
+    /** Number of columns in the display grid **/
     private static final int NUM_GRID_COLUMNS = 2;
     private GalleryAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
+    private GridLayoutManager layoutManager;
 
     /** this is the model that will be synced with the adapter **/
     private List<Photo> photos;
+    private Category category;
+
+    /** current page of the list **/
+    private int currentPage;
 
     private DataProvider dataProvider;
 
-    private Category category;
-
+    /** UI thread updater **/
     private Handler handler;
+
+    /** indicates that we will clear all data and reload everything **/
+    private boolean reset;
+
+    /********************************************************
+     * SCROLL CALLBACKS
+     ********************************************************/
+
+    private RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            if (isLastItemDisplaying(recyclerView)) {
+                Log.d(TAG, "Reaching the end of the list! fetching data for more...");
+
+                dataProvider.getPhotos(category, currentPage + 1);
+            }
+        }
+    };
+
+    private boolean isLastItemDisplaying(RecyclerView recyclerView) {
+        if (recyclerView.getAdapter().getItemCount() != 0 && layoutManager != null) {
+            int lastVisibleItemPosition = layoutManager.findLastCompletelyVisibleItemPosition();
+            if (lastVisibleItemPosition != RecyclerView.NO_POSITION
+                    && lastVisibleItemPosition == recyclerView.getAdapter().getItemCount() - 1)
+                return true;
+        }
+        return false;
+    }
 
     /********************************************************
      * ACTIVITY CALLBACKS
@@ -55,6 +99,8 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         super.onCreate(savedInstanceState);
 
         // initialize states and data handler
+        currentPage = 0;
+        reset = false;
         photos = new ArrayList<>();
         ApplicationState state = ApplicationState.getInstance(this);
         dataProvider = DataProvider.getInstance(state);
@@ -79,9 +125,10 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
         adapter = new GalleryAdapter(getApplicationContext(), photos, this);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);
-            GridLayoutManager layoutManager = new GridLayoutManager(this, NUM_GRID_COLUMNS);
+            layoutManager = new GridLayoutManager(this, NUM_GRID_COLUMNS);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
+            recyclerView.addOnScrollListener(scrollListener);
         }
 
         // begin loading photos from the REST endpoint
@@ -95,7 +142,7 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
             if (getSupportActionBar() != null) getSupportActionBar().setTitle(category.asQueryParameter());
 
             // begin retrieving the photos!
-            dataProvider.getPhotos(category);
+            dataProvider.getPhotos(category, currentPage + 1);
 
             // this is to force the icon of refreshing to show
             // if we don't do this, it won't show!
@@ -136,24 +183,40 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
     @Override
     public boolean handleMessage(Message msg) {
         switch(msg.what) {
+
+            // triggered when the loading of photos is completed successfully
             case Event.GET_PHOTOS_SUCCESS: {
                 List<Photo> temp = msg.obj == null ? null : (List<Photo>) msg.obj;
-                if (temp != null) {
-                    photos.clear();
+                currentPage = msg.arg1;
+
+                // if there is something to add to the list
+                if (temp != null && !temp.isEmpty()) {
+
+                    // if user has refreshed manually, we clear the data first
+                    if (reset) {
+                        photos.clear();
+                        reset = false;
+                    }
+
                     photos.addAll(temp);
-                }
-                else {
-                    photos.clear();
+
+                    // force the adapter to rebind the data because the model has been updated
+                    adapter.notifyDataSetChanged();
                 }
 
-                // force the adapter to rebind the data because the model has been updated
-                adapter.notifyDataSetChanged();
+                // otherwise, no more photos loaded
+                else {
+                    Toast.makeText(getApplicationContext(),
+                            getString(R.string.no_more_photos_available), Toast.LENGTH_LONG).show();
+                }
 
                 // stop the refreshing icon
                 refreshLayout.setRefreshing(false);
 
                 break;
             }
+
+            // triggered when there was a problem loading list of photos
             case Event.GET_PHOTOS_FAILED: {
 
                 break;
@@ -169,7 +232,9 @@ public class GalleryActivity extends AppCompatActivity implements Handler.Callba
 
     @Override
     public void onRefresh() {
-        dataProvider.getPhotos(category);
+        currentPage = 0;
+        reset = true;
+        dataProvider.getPhotos(category, currentPage + 1);
     }
 
     /********************************************************
